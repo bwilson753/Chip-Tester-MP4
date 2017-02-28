@@ -1,0 +1,118 @@
+Script started on Sun Nov 15 22:22:07 2015
+warning: could not update utmp entry
+blade57(1)% ls
+#chiptest.c#           chiptest.opc           scope.c
+Makefile               chiptest.sh            scope.script
+Rubric.docx            ls00_chip.c            scope.sh
+ascollect.s            ls00_chip.opc          syms
+ccollect.c             ls100badboard.script   test-scope.script
+chip.h                 ls100goodboard.script  testLS00.script
+chiptest.c             ls138_chip.c           testLS138.script
+chiptest.c~            ls138_chip.opc
+chiptest.lnx           mp4.doc
+blade57(2)% make chiptest.lnx
+make: `chiptest.lnx' is up to date.
+blade57(3)% mtip -d[Kf [Kb 7 -f chiptest.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 7 
+
+Tutor> ~resetting board #7!
+Please type <CR> to confirm console setting: 
+Setting console dev to COM2Console: colour EGA+ 80x25
+COM1 at 0x03f8 (irq = 4) is a 16550A
+COM2 at 0x02f8 (irq = 3) is a 16550A
+
+                 Welcome to UMB Tutor for the PC
+   UMB Tutor is a 32-bit protected-mode PC debugger/downloader,
+       based on Linux, UMB Tutor for m68k, and remote gdb.
+UMB Tutor is free software and you are welcome to distribute copies
+of it under certain conditions.  There is no warranty for this program.
+The copyright and warranty provisions follow the Gnu general public
+license, available for view in gdb and elsewhere.  Full sources available.
+--bugs, suggestions, questions to eoneil@cs.umb.edu
+
+Exception 3 at EIP=000578f3: Breakpoint
+Tutor> ~downloading chiptest.lnx
+.........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 0
+Testing LS00 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #14
+
+2. Connect the following pins to GND:
+        pin #7
+
+3. Make the following LPT to LS00 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS00 pin:
+          2               1
+          3               2
+          4               4
+          5               5
+          6               9
+          7               10
+          8               12
+          9               13
+        ###(Output pins)###
+        LPT pin:        LS00 pin:
+          15              3
+          13              6
+          12              8
+          10              11
+
+<CR> when ready: 
+chip input:  0
+unfiltered result = 78
+alter2: 0
+inverted 7 bit:  78
+shifted 3:  f
+bits 5 and above are off:  f
+chip_input = 0
+correct output = f
+chip input:  1
+unfiltered result = 78
+alter2: 0
+inverted 7 bit:  78
+shifted 3:  f
+bits 5 and above are off:  f
+chip_input = 1
+correct output = f
+chip input:  2
+unfiltered result = 78
+alter2: 0
+inverted 7 bit:  78
+shifted 3:  f
+bits 5 and above are off:  f
+chip_input = 2
+correct output = f
+chip input:  3
+unfiltered result = 78
+alter2: 0
+inverted 7 bit:  78
+shifted 3:  f
+bits 5 and above are off:  f
+chip_input = 3
+correct output = e
+Failure on input <3>:
+-- Expected output <e> does not match chip output <f>!
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> ~q 
+Quit handler: 
+killing process 8014 Leaving board #7
+blade57(4)% ~q
+Unknown user: q.
+blade57(5)% exit
+script done on Sun Nov 15 22:26:13 2015

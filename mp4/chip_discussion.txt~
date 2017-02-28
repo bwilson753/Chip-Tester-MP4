@@ -1,0 +1,47 @@
+Robert Wilson
+chip_discussion.txt
+
+The two main areas of development of the code were:
+
+1)  Altering the output data from the status register.
+
+2)  Setting up the test cases for the ls138_chip.c file.
+
+In altering the output data the three keys were to invert the 7th bit so that
+data would be accurate for the ls138 output.  It is not relevant to the ls00
+output and needs to be ignored.  After this the bits need to be shifted over
+by three.  Finally, a bit mask needs to be created so that only the appropriate
+output bits are considered.  This is four for the ls00 and five for the ls138.
+
+The key to setting up the test cases for the ls138 is realizing that most of
+the test cases have an output of 0x1f.  Whenever the three most significant
+bits are not 001, the output is 0x1f.  After that there are only 8 other cases
+to consider, so simple boolean logic can be used to test the data.
+
+All of the tests involved in mp5 dealt with monitoring and manipulating the
+various pins.  The ls175 would be a more subtle and thus more difficulty chip
+to test because of the number of pins that are required to be tested and the
+considerations that need to be made for how the pins operate.  The clock pulse
+pin would be the most difficult pin to deal with.
+
+Any algorothm testing the clock pulse would not only have to test the result
+of the response to the clock pulse edge, but it would also have to test what
+happens to input when data is entered before the clock pulse, as well as what
+happens if the data is entered during the clock pulse but not during the
+appropriate edge, and it must also test to see what happens to data after and
+in between clock pulses.  It would be necessary to insure that any
+instructions that were utilized coordinated with the proper timing patterns of
+the clock pulse.
+
+Moreover, it would also be necessary to test the state of the flip-flops
+before, after, and in between clock pulses.  There would be a requirement to
+test the outputs as well as their complements and it would be necessary to
+test to make sure that the outputs were properly coordinated with each other.
+In other words, it would be necessary to ensure that not only are the ouputs
+and complements in their proper state, but it is also necessary to make sure
+that they are in their proper state with respect to each other.
+
+Finally, it is important not to forget that the master reset ought to be
+tested.  And in order to ensure it is working properly, it would be necessary
+to perform the reset when the ls175 is in every possible state that it could
+be in.

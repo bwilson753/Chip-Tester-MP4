@@ -1,0 +1,62 @@
+/*ls138_chip.c*/
+/*Robert Wilson*/
+/*11/15/2009*/
+
+#include "chip.h"
+#include <stdio.h>
+
+/* chip pin configuration -- arrays of pin numbers */
+/* These arrays are only accessed via Chip, i.e., they are
+   building-blocks of the bigger data structure for the chip */
+static int high_pindata[] = {16, 6}; /* VCC and any active high enable inputs */
+static int low_pindata[] = {8, 4, 5};   /* GND and any active low enable inputs */
+static int input_pindata[] = { 1, 2, 3, 4, 5, 6};
+static int output_pindata[] = { 15, 14, 13, 12, 11 };
+
+/* Similarly, softchip is called via Chip's softchip member-- */
+static int ls138_softchip(int inpins,int *outpins);
+
+/* The master data structure for an LS00/2 chip--everything the
+ main program needs to know about this chip-- */
+
+Chip ls138 = {"LS138","quad NAND gate",
+            sizeof(high_pindata)/sizeof(high_pindata[0]),high_pindata,
+            sizeof(low_pindata)/sizeof(low_pindata[0]),low_pindata,
+            sizeof(input_pindata)/sizeof(input_pindata[0]),input_pindata,
+            sizeof(output_pindata)/sizeof(output_pindata[0]),output_pindata,
+            ls138_softchip};
+
+/* use old 2-gates TT for low 4 bits of input, then high 4 bits */
+/* This is pretty ugly! */
+#define LOW_GATES_INPUT_MASK 0x0f
+#define HIGH_GATES_INPUT_MASK 0xf0
+
+/* could use code instead of TT for this-- */
+/* compute outputs for given inputs in bits of int input-- */
+
+static int ls138_softchip( int input, int *output ) {
+  /*check to see if first 3 bits are not 001*/
+  if ((input & 0x38) != 0x20) {
+    *output = 0x1f;
+      return 1;
+      }
+  /*the three msb's are 100 so ignore them and check the eight cases*/
+  input = input & 0x7;
+  if (input == 0)
+    *output = 0x1e;
+  else if (input == 1)
+    *output = 0x1d;
+  else if (input == 2)
+    *output = 0x1b;
+  else if (input == 3)
+    *output = 0x17;
+  else if (input == 4)
+    *output = 0xf;
+  else
+    *output = 0x1f;
+
+    /*printf("softchip 138 currently does notthing.\n");*/
+
+
+    return 1;
+}

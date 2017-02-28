@@ -1,0 +1,645 @@
+Script started on Fri Nov 20 12:29:09 2015
+warning: could not update utmp entry
+blade57(1)% cat chip_discussion.txt
+Robert Wilson
+chip_discussion.txt
+
+The two main areas of development of the code were:
+
+1)  Altering the output data from the status register.
+
+2)  Setting up the test cases for the ls138_chip.c file.
+
+In altering the output data the three keys were to invert the 7th bit so that
+data would be accurate for the ls138 output.  It is not relevant to the ls00
+output and needs to be ignored.  After this the bits need to be shifted over
+by three.  Finally, a bit mask needs to be created so that only the appropriate
+output bits are considered.  This is four for the ls00 and five for the ls138.
+
+The key to setting up the test cases for the ls138 is realizing that most of
+the test cases have an output of 0x1f.  Whenever the three most significant
+bits are not 001, the output is 0x1f.  After that there are only 8 other cases
+to consider, so simple boolean logic can be used to test the data.
+
+All of the tests involved in mp5 dealt with monitoring and manipulating the
+various pins.  The ls175 would be a more subtle and thus more difficulty chip
+to test because of the number of pins that are required to be tested and the
+considerations that need to be made for how the pins operate.  The clock pulse
+pin would be the most difficult pin to deal with.
+
+Any algorithm testing the clock pulse would not only have to test the result
+of the response to the clock pulse edge, but it would also have to test what
+happens to input when data is entered before the clock pulse, as well as what
+happens if the data is entered during the clock pulse but not during the
+appropriate edge, and it must also test to see what happens to data after and
+in between clock pulses.  It would be necessary to insure that any
+instructions that were utilized coordinated with the proper timing patterns of
+the clock pulse.
+
+Moreover, it would also be necessary to test the state of the flip-flops
+before, after, and in between clock pulses.  There would be a requirement to
+test the outputs as well as their complements and it would be necessary to
+test to make sure that the outputs were properly coordinated with each other.
+In other words, it would be necessary to ensure that not only are the outputs
+and complements in their proper state, but it is also necessary to make sure
+that they are in their proper state with respect to each other.
+
+Finally, it is important not to forget that the master reset ought to be
+tested.  And in order to ensure it is working properly, it would be necessary
+to perform the reset when the ls175 is in every possible state that it could
+be in.
+blade57(2)% cat finalrunls.script
+Script started on Fri Nov 20 12:19:11 2015
+warning: could not update utmp entry
+blade57(1)% ls -l
+total 264
+-rw-r--r--   1 rwilson      3624 Nov 15 15:36 Makefile
+-rw-r--r--   1 rwilson     11871 Nov 13 11:24 Rubric.docx
+-rw-r--r--   1 rwilson         0 Nov 13 11:20 ascollect.s
+-rw-r--r--   1 rwilson     43375 Nov 19 18:29 board6.script
+-rw-r--r--   1 rwilson     13225 Nov 20 12:04 board7.script
+-rw-r--r--   1 rwilson         0 Nov 13 11:19 ccollect.c
+-rw-r--r--   1 rwilson       922 Nov 13 11:20 chip.h
+-rw-r--r--   1 rwilson      2560 Nov 18 17:52 chip_discussion.txt
+-rw-r--r--   1 rwilson      2559 Nov 18 17:52 chip_discussion.txt~
+-rw-r--r--   1 rwilson      6832 Nov 20 12:11 chiptest.c
+-rw-r--r--   1 rwilson      6791 Nov 17 14:04 chiptest.c~
+-rwxr-xr-x   1 rwilson     38888 Nov 20 12:11 chiptest.lnx
+-rw-r--r--   1 rwilson      7682 Nov 20 12:11 chiptest.opc
+-rwxr-xr--   1 rwilson       455 Nov 13 11:21 chiptest.sh
+-rw-r--r--   1 rwilson      4625 Nov 20 12:14 finalrun.script
+-rw-r--r--   1 rwilson         0 Nov 20 12:19 finalrunls.script
+-rw-r--r--   1 rwilson      3124 Nov 13 11:21 ls00_chip.c
+-rw-r--r--   1 rwilson      2285 Nov 15 12:50 ls00_chip.opc
+-rw-r--r--   1 rwilson      3394 Nov 15 22:26 ls100badboard.script
+-rw-r--r--   1 rwilson     42388 Nov 15 22:17 ls100goodboard.script
+-rw-r--r--   1 rwilson      1985 Nov 20 11:59 ls138_chip.c
+-rw-r--r--   1 rwilson      1985 Nov 20 11:50 ls138_chip.c~
+-rw-r--r--   1 rwilson      4489 Nov 20 11:59 ls138_chip.opc
+-rw-r--r--   1 rwilson     43008 Nov 13 11:23 mp4.doc
+-rw-r--r--   1 rwilson      5989 Nov 13 11:24 scope.c
+-rw-r--r--   1 rwilson      1741 Nov 13 11:24 scope.script
+-rwxr-xr-x   1 rwilson       464 Nov 13 11:24 scope.sh
+-rw-r--r--   1 rwilson      1988 Nov 13 11:31 syms
+-rw-r--r--   1 rwilson      1905 Nov 13 11:32 test-scope.script
+-rw-r--r--   1 rwilson       550 Nov 13 11:31 testLS00.script
+-rw-r--r--   1 rwilson       612 Nov 13 11:32 testLS138.script
+blade57(2)% make chiptest.lnx
+make: `chiptest.lnx' is up to date.
+blade57(3)% mtip -b 6 -f chiptest.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 6 
+~resetting board #6Failed to open /dev/boardx
+!
+~downloading chiptest.lnx
+.........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 0
+Testing LS00 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #14
+
+2. Connect the following pins to GND:
+        pin #7
+
+3. Make the following LPT to LS00 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS00 pin:
+          2               1
+          3               2
+          4               4
+          5               5
+          6               9
+          7               10
+          8               12
+          9               13
+        ###(Output pins)###
+        LPT pin:        LS00 pin:
+          15              3
+          13              6
+          12              8
+          10              11
+
+<CR> when ready: 
+*** Chip is OK. No failures encountered. ***
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> 1 go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 1
+Testing LS138 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #16
+        pin #6
+
+2. Connect the following pins to GND:
+        pin #8
+        pin #4
+        pin #5
+
+3. Make the following LPT to LS138 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS138 pin:
+          2               1
+          3               2
+          4               3
+          5               4
+          6               5
+          7               6
+        ###(Output pins)###
+        LPT pin:        LS138 pin:
+          15              15
+          13              14
+          12              13
+          10              12
+          11              11
+
+<CR> when ready: 
+Failure on input <3>:
+-- Expected output <1f> does not match chip output <1e>!
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> ~q 
+Quit handler: 
+killing process 11866 Leaving board #6
+blade57(4)% mtip -b 6 -f chiptest.lnx -f chiptest.lnx[K[16D7 -f chiptest.lnx[16D
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 7 
+~resetting board #7Failed to open /dev/boardx
+!
+~downloading chiptest.lnx
+.........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 0
+Testing LS00 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #14
+
+2. Connect the following pins to GND:
+        pin #7
+
+3. Make the following LPT to LS00 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS00 pin:
+          2               1
+          3               2
+          4               4
+          5               5
+          6               9
+          7               10
+          8               12
+          9               13
+        ###(Output pins)###
+        LPT pin:        LS00 pin:
+          15              3
+          13              6
+          12              8
+          10              11
+
+<CR> when ready: 
+Failure on input <3>:
+-- Expected output <e> does not match chip output <f>!
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 1
+Testing LS138 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #16
+        pin #6
+
+2. Connect the following pins to GND:
+        pin #8
+        pin #4
+        pin #5
+
+3. Make the following LPT to LS138 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS138 pin:
+          2               1
+          3               2
+          4               3
+          5               4
+          6               5
+          7               6
+        ###(Output pins)###
+        LPT pin:        LS138 pin:
+          15              15
+          13              14
+          12              13
+          10              12
+          11              11
+
+<CR> when ready: 
+*** Chip is OK. No failures encountered. ***
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> ~q 
+Quit handler: 
+killing process 11870 Leaving board #7
+blade57(5)% exit
+script done on Fri Nov 20 12:21:55 2015
+blade57(3)% cat chiptest.c
+/******************************************************************
+*
+*   file:   chiptest.c
+*   author: Ethan Bolker
+*   date:   October, 1991
+*   edited by Betty O'Neil, Apr, 1992, Apr, 1996, Nov, 1996
+*
+*   Chip testing program stub
+*
+*   Link with file containing the following global data structures 
+*   describing the particular chip to be tested
+*
+*/
+ 
+#include <stdio.h>
+#include "chip.h"
+#ifdef SAPC
+#include <lp.h>
+#include <cpu.h>
+#include <serial.h>
+#endif
+
+#define MAXBUF 200
+/* final program should have INTERACTIVE defined, but
+ * you may want to comment this out while debugging
+ * to get rid of the user input.
+ */
+#define INTERACTIVE
+/* non-interactive values-- */
+#define DEFAULT_CHIPNUM 0
+
+/* These arrays specify the logical order of LPT input and output pins */
+static int PDR_pins[] = {2, 3, 4, 5, 6, 7, 8, 9};/* chip inputs, LPT output */
+static int PSR_pins[] = {15, 13, 12, 10, 11}; /* chip outputs, LPT input */
+
+int get_int_in_range(int, int);
+void getline(char *buf, int maxbuf);
+void chiptest(Chip *chip);
+
+/* add to these-- */
+extern Chip ls00;
+extern Chip ls138;
+Chip *chips[]={&ls00, &ls138};
+#define NCHIPS (sizeof(chips)/sizeof(chips[0]))
+
+int main(void)
+{
+  int i, chipnum = DEFAULT_CHIPNUM;
+
+  printf("Chip tester for chip(s):\n");
+  for (i=0;i<NCHIPS;i++) 
+    printf("%d--  %s\n",i,chips[i]->chipname);
+#ifdef INTERACTIVE
+  printf("\nEnter chip to test: ");
+  chipnum = get_int_in_range(0,NCHIPS-1);
+#endif
+  chiptest(chips[chipnum]);
+  return 0;
+}
+
+/* This needs filling out.  This code should work for any combinational
+   chip with properly setup Chip data (unless it has too many input or
+   output pins.)  Thus it should not do special-case code for LS138
+   vs. LS00, for example.  On the other hand, it does need to know 
+   about the LPT1 port, for ex., that outpins bit 0 needs to be read
+   from PSR bit 3, and one of these PSR bits needs to be inverted 
+   to get the chip's signal.
+*/
+/*****************************************/
+/* This part is written to give the user */
+/* pin connection instructions that are  */
+/* derived from the Chip info only.      */
+/* Note that some chips are already      */
+/* connected up to mtip systems for you. */
+/* See chiptest.txt for more information. */
+/*****************************************/
+void chiptest(Chip *chip)
+{
+  int i;
+  int chip_input, chip_output, correct_output;
+  int bit_mask; /*added*/
+
+  printf("Testing %s chip (%s)\n\n", chip->chipname,chip->chipdesc);
+  printf("Connection requirements:\n\n");
+
+  printf("1. Connect the following pins to VCC:\n");
+  for (i=0; i<chip->n_highpins; i++) {
+    printf("\tpin #%d\n", chip->highpins[i]);
+  }
+  printf("\n");
+
+  printf("2. Connect the following pins to GND:\n");
+  /* you fill in */
+  for (i = 0; i<chip->n_lowpins; i++) {
+    printf("\tpin #%d\n", chip->lowpins[i]);
+  }
+  printf("\n");
+
+  printf("3. Make the following LPT to %s connections:\n\n", chip->chipname);
+  printf("\t###(Chip_Input pins)###\n");
+  printf("\tLPT pin:\t%s pin:\n", chip->chipname);
+  for (i=0; i<chip->n_inpins; i++)
+        printf ("\t  %d\t\t  %d\n", PDR_pins[i], chip->inpins[i]);
+
+  printf("\t###(Output pins)###\n");
+  /* you fill in */
+   printf("\tLPT pin:\t%s pin:\n", chip->chipname);
+   for (i=0; i<chip->n_outpins; i++)
+         printf ("\t  %d\t\t  %d\n", PSR_pins[i], chip->outpins[i]);
+
+
+#ifdef INTERACTIVE  
+  printf("\n<CR> when ready: ");
+  while (getchar()!='\n')
+    ;
+#endif
+
+  /* generate all bit patterns by counting up to the right power of 2 */
+  for (chip_input = 0; chip_input < (1 << chip->n_inpins); chip_input++) {
+    /* you fill in */
+    /* First use put chip_input value out LPT1, read back chip's result. */
+   static int alter1, alter2;
+   /*chip_input = 0xc3;*/
+
+   /*THIS IS THE ACTUAL INPUT AND OUTPUT*/
+   /*set the 3 leftmost bits to 001*/
+   /*first set them to 000*/
+   /*chip_input = chip_input & 0x1f;*/
+   /*now set them to 001*/
+   /*chip_input = chip_input & 0x3f;*/
+   /*printf("modified input:  %x", chip_input);*/
+
+   outpt(LPT1_BASE + LP_DATA, chip_input);
+   chip_output = inpt(LPT1_BASE + LP_STATUS);
+   /*printf("chip input:  %x\n", chip_input);*/ 
+   /*printf("unfiltered result = %x\n", chip_output);*/
+
+   /*TEST*/
+   /*chip_output = 0x7f;
+   printf("test value:  %x\n", chip_output);*/
+
+   /*BEGIN MDOIFIED OUTPUT*/
+
+   /*invert busy  bit 7*/
+   alter1 = 0x80;
+   alter2 = chip_output & alter1;
+   /*printf("alter2: %x\n", alter2);*/
+
+   /*this inverts the 7 bit*/
+   if (alter2 != 0) {
+     /*printf("before and:  %x\n", chip_output);*/
+        chip_output = chip_output & 0x7f;
+         /*0111 1111*/
+        /*printf("anded:  %x\n", chip_output);*/
+    }
+   else {
+        chip_output = chip_output | 0x80;
+         /*1000 0000*/
+        /*printf("ored:  %x\n", chip_output);*/
+   }
+
+   /*printf("inverted 7 bit:  %x\n", chip_output);*/
+
+  /*shift the bits to the right by 3*/
+  chip_output = chip_output >> 3;
+  /*printf("shifted 3:  %x\n", chip_output);*/
+
+  /*turn on appropriate bit amount (4 for ls00, 5 for ls138*/
+  bit_mask = 2; /*assumes at least 1 outpin*/
+  for (i = 1; i < chip->n_outpins; i++) {
+        bit_mask = bit_mask * 2;
+  }  
+  bit_mask = bit_mask - 1; /*bit mask value equals out pins*/ 
+  chip_output = chip_output & bit_mask;  
+  /*printf("bits mask is on:  %x\n", chip_output);*/
+
+  /*END MODIFIED OUTPUT*/
+
+   /*BEGIN EXPECTED OUTPUT*/
+   chip->softchip(chip_input, &correct_output);
+   /*printf("chip_input = %x\n", chip_input);*/ 
+   /*printf("correct output = %x\n", correct_output);*/
+   /*END EXPECTED OUTPUT*/
+
+    /* Invert the LP_BUSY bit to compensate for its inversion in the */
+    /* device: see pg 631 in S&S.  Shift the bits to the right by 3 */
+    /* to get them in bits 0-4 to prepare for comparison. */
+    /* Also make sure all bits at bit 5 or above are off. */
+    /* Call "softchip" for chip to get correct result, also in bits 0-4. */
+    /* Then compare the two results and report-- */
+
+    if (chip_output != correct_output) {
+      printf("Failure on input <%x>:\n", chip_input);
+      printf("-- Expected output <%x> does not match chip output <%x>!\n",
+              correct_output, chip_output);
+      return;  /* give up on first failure */
+    }
+  }
+  printf("*** Chip is OK. No failures encountered. ***\n");
+}
+
+/* portable function to get int value from user */
+int get_int_in_range(int low, int high)
+{
+  char buf[MAXBUF];
+  int num;
+
+  getline(buf, MAXBUF);
+  while ((sscanf(buf,"%d",&num)!=1) || (num<low) || (num>high)) {
+    printf("Please enter a decimal number between %d and %d: ",low, high);
+    getline(buf, MAXBUF);
+  }
+  return num;
+}    
+
+/* Turn platform-dependent library function calls into platform-independent
+   function to get one line from the user.
+*/
+void getline(char *buf, int maxbuf)
+{
+#ifdef SAPC
+    fgets(buf, maxbuf, CONSOLE);
+#else
+    fgets(buf, maxbuf, stdin);
+#endif
+}
+
+blade57(4)% cat ls00_chip.c
+/******************************************************************
+*
+*   file:   ls00.chip
+*   author: Ethan Bolker
+*   date:   October, 1991
+*
+*   Data file specifying (part of) an LS00 quad nand gate chip.
+*   By limiting the testing to two of the four gates I need only
+*   a 16 line rather than a 256 line truth table! But I could 
+*   probably have gotten all the logic in fewer than 16 lines by
+*   programming the nand logic in c.
+*
+*   Link with chiptest.o/opc to produce executable testing code.
+*/
+
+#include "chip.h"
+
+/* chip pin configuration -- arrays of pin numbers */
+/* These arrays are only accessed via Chip, i.e., they are
+   building-blocks of the bigger data structure for the chip */
+static int high_pindata[] = {14}; /* VCC and any active high enable inputs */
+static int low_pindata[] = {7};   /* GND and any active low enable inputs */
+static int input_pindata[] = { 1, 2, 4, 5, 9, 10, 12, 13 };
+static int output_pindata[] = { 3, 6, 8, 11 };
+
+/* Similarly, softchip is called via Chip's softchip member-- */
+static int ls00_softchip(int inpins,int *outpins);
+
+/* The master data structure for an LS00/2 chip--everything the
+ main program needs to know about this chip-- */
+
+Chip ls00 = {"LS00","quad NAND gate",
+            sizeof(high_pindata)/sizeof(high_pindata[0]),high_pindata,
+            sizeof(low_pindata)/sizeof(low_pindata[0]),low_pindata,
+            sizeof(input_pindata)/sizeof(input_pindata[0]),input_pindata,
+            sizeof(output_pindata)/sizeof(output_pindata[0]),output_pindata,
+            ls00_softchip};
+
+/* truth table:   in pin  5 4 2 1  out pin  6 3 */
+static int TT[] = { 
+             0x03,     /* 0 0 0 0           1 1 */
+             0x03,     /* 0 0 0 1           1 1 */
+             0x03,     /* 0 0 1 0           1 1 */
+             0x02,     /* 0 0 1 1           1 0 */
+             0x03,     /* 0 1 0 0           1 1 */
+             0x03,     /* 0 1 0 1           1 1 */
+             0x03,     /* 0 1 1 0           1 1 */
+             0x02,     /* 0 1 1 1           1 0 */
+             0x03,     /* 1 0 0 0           1 1 */
+             0x03,     /* 1 0 0 1           1 1 */
+             0x03,     /* 1 0 1 0           1 1 */
+             0x02,     /* 1 0 1 1           1 0 */
+             0x01,     /* 1 1 0 0           0 1 */
+             0x01,     /* 1 1 0 1           0 1 */
+             0x01,     /* 1 1 1 0           0 1 */
+             0x00,     /* 1 1 1 1           0 0 */
+};
+
+/* use old 2-gates TT for low 4 bits of input, then high 4 bits */
+/* This is pretty ugly! */
+#define LOW_GATES_INPUT_MASK 0x0f
+#define HIGH_GATES_INPUT_MASK 0xf0
+
+/* could use code instead of TT for this-- */
+/* compute outputs for given inputs in bits of int input-- */
+
+static int ls00_softchip( int input, int *output ) {
+    int low_gates_expected_output = TT[input & LOW_GATES_INPUT_MASK];
+    /* do same for high 2 gates, shifted over by 4 bits on input, 
+       shifted back 2 on output, next to the 2 bits from first 2 gates */
+    int high_gates_expected_output = 
+      (TT[(input & HIGH_GATES_INPUT_MASK)>>4])<<2;
+    *output = high_gates_expected_output|low_gates_expected_output;
+    return 1;
+}
+blade57(5)% cat ls138_chip.c
+/*ls138_chip.c*/
+/*Robert Wilson*/
+/*11/15/2009*/
+
+#include "chip.h"
+#include <stdio.h>
+
+/* chip pin configuration -- arrays of pin numbers */
+/* These arrays are only accessed via Chip, i.e., they are
+   building-blocks of the bigger data structure for the chip */
+static int high_pindata[] = {16, 6}; /* VCC and any active high enable inputs */
+static int low_pindata[] = {8, 4, 5};   /* GND and any active low enable inputs */
+static int input_pindata[] = { 1, 2, 3, 4, 5, 6};
+static int output_pindata[] = { 15, 14, 13, 12, 11 };
+
+/* Similarly, softchip is called via Chip's softchip member-- */
+static int ls138_softchip(int inpins,int *outpins);
+
+/* The master data structure for an LS00/2 chip--everything the
+ main program needs to know about this chip-- */
+
+Chip ls138 = {"LS138","quad NAND gate",
+            sizeof(high_pindata)/sizeof(high_pindata[0]),high_pindata,
+            sizeof(low_pindata)/sizeof(low_pindata[0]),low_pindata,
+            sizeof(input_pindata)/sizeof(input_pindata[0]),input_pindata,
+            sizeof(output_pindata)/sizeof(output_pindata[0]),output_pindata,
+            ls138_softchip};
+
+/* use old 2-gates TT for low 4 bits of input, then high 4 bits */
+/* This is pretty ugly! */
+#define LOW_GATES_INPUT_MASK 0x0f
+#define HIGH_GATES_INPUT_MASK 0xf0
+
+/* could use code instead of TT for this-- */
+/* compute outputs for given inputs in bits of int input-- */
+
+static int ls138_softchip( int input, int *output ) {
+  /*check to see if first 3 bits are not 001*/
+  if ((input & 0x38) != 0x20) {
+    *output = 0x1f;
+      return 1;
+      }
+  /*the three msb's are 100 so ignore them and check the eight cases*/
+  input = input & 0x7;
+  if (input == 0)
+    *output = 0x1e;
+  else if (input == 1)
+    *output = 0x1d;
+  else if (input == 2)
+    *output = 0x1b;
+  else if (input == 3)
+    *output = 0x17;
+  else if (input == 4)
+    *output = 0xf;
+  else
+    *output = 0x1f;
+
+    /*printf("softchip 138 currently does notthing.\n");*/
+
+
+    return 1;
+}
+blade57(6)% exit
+script done on Fri Nov 20 12:30:34 2015

@@ -1,0 +1,225 @@
+Script started on Fri Nov 20 12:19:11 2015
+warning: could not update utmp entry
+blade57(1)% ls -l
+total 264
+-rw-r--r--   1 rwilson      3624 Nov 15 15:36 Makefile
+-rw-r--r--   1 rwilson     11871 Nov 13 11:24 Rubric.docx
+-rw-r--r--   1 rwilson         0 Nov 13 11:20 ascollect.s
+-rw-r--r--   1 rwilson     43375 Nov 19 18:29 board6.script
+-rw-r--r--   1 rwilson     13225 Nov 20 12:04 board7.script
+-rw-r--r--   1 rwilson         0 Nov 13 11:19 ccollect.c
+-rw-r--r--   1 rwilson       922 Nov 13 11:20 chip.h
+-rw-r--r--   1 rwilson      2560 Nov 18 17:52 chip_discussion.txt
+-rw-r--r--   1 rwilson      2559 Nov 18 17:52 chip_discussion.txt~
+-rw-r--r--   1 rwilson      6832 Nov 20 12:11 chiptest.c
+-rw-r--r--   1 rwilson      6791 Nov 17 14:04 chiptest.c~
+-rwxr-xr-x   1 rwilson     38888 Nov 20 12:11 chiptest.lnx
+-rw-r--r--   1 rwilson      7682 Nov 20 12:11 chiptest.opc
+-rwxr-xr--   1 rwilson       455 Nov 13 11:21 chiptest.sh
+-rw-r--r--   1 rwilson      4625 Nov 20 12:14 finalrun.script
+-rw-r--r--   1 rwilson         0 Nov 20 12:19 finalrunls.script
+-rw-r--r--   1 rwilson      3124 Nov 13 11:21 ls00_chip.c
+-rw-r--r--   1 rwilson      2285 Nov 15 12:50 ls00_chip.opc
+-rw-r--r--   1 rwilson      3394 Nov 15 22:26 ls100badboard.script
+-rw-r--r--   1 rwilson     42388 Nov 15 22:17 ls100goodboard.script
+-rw-r--r--   1 rwilson      1985 Nov 20 11:59 ls138_chip.c
+-rw-r--r--   1 rwilson      1985 Nov 20 11:50 ls138_chip.c~
+-rw-r--r--   1 rwilson      4489 Nov 20 11:59 ls138_chip.opc
+-rw-r--r--   1 rwilson     43008 Nov 13 11:23 mp4.doc
+-rw-r--r--   1 rwilson      5989 Nov 13 11:24 scope.c
+-rw-r--r--   1 rwilson      1741 Nov 13 11:24 scope.script
+-rwxr-xr-x   1 rwilson       464 Nov 13 11:24 scope.sh
+-rw-r--r--   1 rwilson      1988 Nov 13 11:31 syms
+-rw-r--r--   1 rwilson      1905 Nov 13 11:32 test-scope.script
+-rw-r--r--   1 rwilson       550 Nov 13 11:31 testLS00.script
+-rw-r--r--   1 rwilson       612 Nov 13 11:32 testLS138.script
+blade57(2)% make chiptest.lnx
+make: `chiptest.lnx' is up to date.
+blade57(3)% mtip -b 6 -f chiptest.lnx
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 6 
+~resetting board #6Failed to open /dev/boardx
+!
+~downloading chiptest.lnx
+.........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 0
+Testing LS00 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #14
+
+2. Connect the following pins to GND:
+        pin #7
+
+3. Make the following LPT to LS00 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS00 pin:
+          2               1
+          3               2
+          4               4
+          5               5
+          6               9
+          7               10
+          8               12
+          9               13
+        ###(Output pins)###
+        LPT pin:        LS00 pin:
+          15              3
+          13              6
+          12              8
+          10              11
+
+<CR> when ready: 
+*** Chip is OK. No failures encountered. ***
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> 1 go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 1
+Testing LS138 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #16
+        pin #6
+
+2. Connect the following pins to GND:
+        pin #8
+        pin #4
+        pin #5
+
+3. Make the following LPT to LS138 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS138 pin:
+          2               1
+          3               2
+          4               3
+          5               4
+          6               5
+          7               6
+        ###(Output pins)###
+        LPT pin:        LS138 pin:
+          15              15
+          13              14
+          12              13
+          10              12
+          11              11
+
+<CR> when ready: 
+Failure on input <3>:
+-- Expected output <1f> does not match chip output <1e>!
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> ~q 
+Quit handler: 
+killing process 11866 Leaving board #6
+blade57(4)% mtip -b 6 -f chiptest.lnx -f chiptest.lnx[K[16D7 -f chiptest.lnx[16D
+For command help, type ~?
+For help on args, rerun without args
+Code starts at 0x100100
+Using board # 7 
+~resetting board #7Failed to open /dev/boardx
+!
+~downloading chiptest.lnx
+.........Done.
+
+Download done, setting EIP to 100100.
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 0
+Testing LS00 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #14
+
+2. Connect the following pins to GND:
+        pin #7
+
+3. Make the following LPT to LS00 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS00 pin:
+          2               1
+          3               2
+          4               4
+          5               5
+          6               9
+          7               10
+          8               12
+          9               13
+        ###(Output pins)###
+        LPT pin:        LS00 pin:
+          15              3
+          13              6
+          12              8
+          10              11
+
+<CR> when ready: 
+Failure on input <3>:
+-- Expected output <e> does not match chip output <f>!
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> go 100100
+Chip tester for chip(s):
+0--  LS00
+1--  LS138
+
+Enter chip to test: 1
+Testing LS138 chip (quad NAND gate)
+
+Connection requirements:
+
+1. Connect the following pins to VCC:
+        pin #16
+        pin #6
+
+2. Connect the following pins to GND:
+        pin #8
+        pin #4
+        pin #5
+
+3. Make the following LPT to LS138 connections:
+
+        ###(Chip_Input pins)###
+        LPT pin:        LS138 pin:
+          2               1
+          3               2
+          4               3
+          5               4
+          6               5
+          7               6
+        ###(Output pins)###
+        LPT pin:        LS138 pin:
+          15              15
+          13              14
+          12              13
+          10              12
+          11              11
+
+<CR> when ready: 
+*** Chip is OK. No failures encountered. ***
+Exception 3 at EIP=00100110: Breakpoint
+Tutor> ~q 
+Quit handler: 
+killing process 11870 Leaving board #7
+blade57(5)% exit
+script done on Fri Nov 20 12:21:55 2015
